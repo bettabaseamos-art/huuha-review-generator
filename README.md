@@ -1,35 +1,61 @@
-# Huuha Land 评价生成器
+# J.VOGUE 穿搭分享生成器
 
-🎯 一键生成小红书风格评价文案
+🎯 一键生成小红书/Instagram/Facebook 风格穿搭分享文案
 
-🔗 **在线访问**: https://amos-storage.github.io/huuha-review-generator
+🔗 **在线访问**: https://bettabaseamos-art.github.io/huuha-review-generator
 
-## 功能
+## 功能特点
 
-- ✅ 多语言表单填写
-- ✅ AI 智能生成文案
-- ✅ 图片自动合成
-- ✅ 一键复制到剪贴板
-- ✅ 跳转到小红书
+### ✨ 一键生成（给懒惰想的顾客）
+- 4种分享风格模板可选：
+  - 😊 轻松随意 - 简单自然的分享
+  - ✨ 时尚种草 - 强调时尚感和推荐
+  - 📝 详细测评 - 全面的穿着体验
+  - 💫 生活方式 - 情感化的生活分享
+- AI 自动生成完整文案
+
+### 📝 自定义填写
+- 购买服饰类型（上衣/裤装/裙装/外套/配饰/鞋履）
+- 最满意的地方（版型/面料/设计/性价比/百搭/服务）
+- 发现渠道
+- 穿搭感受
+
+### 🖼️ 智能图片合成
+- 自动添加 J.VOGUE 品牌标识
+- 小红书风格图片比例（3:4）
+- 一键下载分享图
+
+### 📤 多平台分享
+- 小红书
+- Instagram
+- Facebook
+- 一键复制全部内容
 
 ## 技术栈
 
 - 纯前端 HTML/CSS/JavaScript
-- GitHub Pages 部署
+- GitHub Pages 免费部署
 - 无需后端服务器
 
-## 本地开发
+## 适用场景
 
-```bash
-git clone https://github.com/amos-storage/huuha-review-generator.git
-cd huuha-review-generator
-python3 -m http.server 8080
-# 打开 http://localhost:8080
-```
+- 服装店顾客评价收集
+- 品牌社交媒体内容生成
+- 穿搭博主内容创作
 
-## 部署
+## 更新日志
 
-自动部署到 GitHub Pages，推送代码后自动更新。
+### v1.1 (当前版本)
+- ✅ 改为 J.VOGUE 服装零售版本
+- ✅ 移除"体验项目"，改为服饰类型
+- ✅ 新增"一键生成"功能
+- ✅ 4种分享风格模板
+- ✅ 支持多平台分享
+
+### v1.0
+- 基础表单和生成
+- 图片合成
+- 小红书分享
 
 ---
-Powered by BrandWriter.AI Clone
+Made for J.VOGUE | 马来西亚时尚品牌

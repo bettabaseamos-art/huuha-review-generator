@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Huuha Land - 评价生成器</title>
+    <title>J.VOGUE - 分享你的穿搭体验</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #f5f0ff 0%, #fff0f5 100%);
+            background: linear-gradient(135deg, #f8f8f8 0%, #f0f0f0 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -24,7 +24,7 @@
             background: white;
             border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 10px 40px rgba(147, 112, 219, 0.1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
         }
         
         .header {
@@ -33,21 +33,21 @@
         }
         
         .logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 100px;
             margin: 0 auto 15px;
-            font-size: 32px;
+        }
+        
+        .logo img {
+            width: 100%;
+            height: auto;
         }
         
         h1 {
             color: #333;
-            font-size: 24px;
+            font-size: 22px;
             margin-bottom: 5px;
+            font-weight: 600;
+            letter-spacing: 2px;
         }
         
         .subtitle {
@@ -90,14 +90,14 @@
         }
         
         .option-btn:hover {
-            border-color: #667eea;
-            color: #667eea;
+            border-color: #333;
+            color: #333;
         }
         
         .option-btn.selected {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #333;
             color: white;
-            border-color: transparent;
+            border-color: #333;
         }
         
         textarea {
@@ -113,7 +113,7 @@
         
         textarea:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #333;
         }
         
         .upload-area {
@@ -126,20 +126,81 @@
         }
         
         .upload-area:hover {
-            border-color: #667eea;
-            background: #f8f7ff;
+            border-color: #333;
+            background: #f8f8f8;
         }
         
-        .upload-area i {
+        .upload-area .icon {
             font-size: 48px;
-            color: #667eea;
             margin-bottom: 10px;
+        }
+        
+        .quick-generate-section {
+            background: linear-gradient(135deg, #f8f8f8 0%, #f0f0f0 100%);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            text-align: center;
+            border: 2px dashed #ccc;
+        }
+        
+        .quick-generate-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .quick-generate-desc {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .quick-generate-btn {
+            background: linear-gradient(135deg, #333 0%, #555 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .quick-generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 30px 0;
+            color: #999;
+            font-size: 13px;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #e0e0e0;
+        }
+        
+        .divider span {
+            padding: 0 15px;
         }
         
         .generate-btn {
             width: 100%;
             padding: 16px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #333;
             color: white;
             border: none;
             border-radius: 12px;
@@ -152,7 +213,7 @@
         
         .generate-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
         
         .generate-btn:disabled {
@@ -170,81 +231,150 @@
         .hidden {
             display: none;
         }
+        
+        .template-selector {
+            background: #f8f8f8;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .template-selector label {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .template-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .template-btn {
+            padding: 8px 14px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        
+        .template-btn:hover,
+        .template-btn.selected {
+            background: #333;
+            color: white;
+            border-color: #333;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">🐱</div>
-            <h1>Huuha Land</h1>
-            <p class="subtitle">分享你的市集体验</p>
+            <div class="logo">
+                <svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+                    <text x="10" y="45" font-family="Arial, sans-serif" font-size="36" font-weight="bold" fill="#333">J.</text>
+                    <path d="M 50 45 L 70 15 L 90 45" stroke="#333" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    <text x="95" y="45" font-family="Arial, sans-serif" font-size="36" font-weight="bold" fill="#333">OGUE</text>
+                </svg>
+            </div>
+            <h1>J.VOGUE</h1>
+            <p class="subtitle">分享你的穿搭体验</p>
         </div>
         
         <form id="reviewForm">
-            <!-- 服务项目 -->
-            <div class="form-group">
-                <label class="required">你这次体验了哪些项目？</label>
-                <div class="options" id="services">
-                    <button type="button" class="option-btn" data-value="宠物相关产品">宠物相关产品</button>
-                    <button type="button" class="option-btn" data-value="大马品牌手工艺品">大马品牌手工艺品</button>
-                    <button type="button" class="option-btn" data-value="驻唱歌手">驻唱歌手</button>
-                    <button type="button" class="option-btn" data-value="特色美食">特色美食</button>
-                    <button type="button" class="option-btn" data-value="创意摊位">创意摊位</button>
+            <!-- 一键生成区域（给懒惰想的顾客） -->
+            <div class="quick-generate-section">
+                <div class="quick-generate-title">⚡ 懒得想文案？</div>
+                <p class="quick-generate-desc">选择模板，AI 一键生成完美分享文案</p>
+                
+                <div class="template-selector">
+                    <label>选择分享风格：</label>
+                    <div class="template-options" id="templateOptions">
+                        <button type="button" class="template-btn" data-template="casual">😊 轻松随意</button>
+                        <button type="button" class="template-btn" data-template="fashion">✨ 时尚种草</button>
+                        <button type="button" class="template-btn" data-template="detailed">📝 详细测评</button>
+                        <button type="button" class="template-btn" data-template="lifestyle">💫 生活方式</button>
+                    </div>
+                    <input type="hidden" id="selectedTemplate" name="template">
                 </div>
-                <input type="hidden" id="selectedServices" name="services" required>
+                
+                <button type="button" class="quick-generate-btn" id="quickGenerateBtn">
+                    ✨ 一键生成文案
+                </button>
             </div>
             
-            <!-- 共鸣点 -->
+            <div class="divider">
+                <span>或 自己填写</span>
+            </div>
+            
+            <!-- 购买产品类型 -->
             <div class="form-group">
-                <label class="required">哪一点最让你有感觉？</label>
-                <div class="options" id="feelings">
-                    <button type="button" class="option-btn" data-value="新年气氛">有新年气氛</button>
-                    <button type="button" class="option-btn" data-value="宝藏小众好物">宝藏小众好物</button>
-                    <button type="button" class="option-btn" data-value="食物很好吃">食物很好吃</button>
-                    <button type="button" class="option-btn" data-value="轻松惬意的氛围">轻松惬意的氛围</button>
-                    <button type="button" class="option-btn" data-value="平民市集">平民市集终于复活了改名为Huuha Land</button>
+                <label class="required">你购买了什么类型的服饰？</label>
+                <div class="options" id="productTypes">
+                    <button type="button" class="option-btn" data-value="上衣">👕 上衣</button>
+                    <button type="button" class="option-btn" data-value="裤装">👖 裤装</button>
+                    <button type="button" class="option-btn" data-value="裙装">👗 裙装</button>
+                    <button type="button" class="option-btn" data-value="外套">🧥 外套</button>
+                    <button type="button" class="option-btn" data-value="配饰">👜 配饰</button>
+                    <button type="button" class="option-btn" data-value="鞋履">👟 鞋履</button>
                 </div>
-                <input type="hidden" id="selectedFeeling" name="feeling" required>
+                <input type="hidden" id="selectedProducts" name="products" required>
+            </div>
+            
+            <!-- 最满意的地方 -->
+            <div class="form-group">
+                <label class="required">最让你满意的是什么？</label>
+                <div class="options" id="highlights">
+                    <button type="button" class="option-btn" data-value="版型合身">✂️ 版型合身</button>
+                    <button type="button" class="option-btn" data-value="面料舒适">🧵 面料舒适</button>
+                    <button type="button" class="option-btn" data-value="设计独特">🎨 设计独特</button>
+                    <button type="button" class="option-btn" data-value="性价比高">💰 性价比高</button>
+                    <button type="button" class="option-btn" data-value="百搭实穿">🔄 百搭实穿</button>
+                    <button type="button" class="option-btn" data-value="服务周到">💁 服务周到</button>
+                </div>
+                <input type="hidden" id="selectedHighlight" name="highlight" required>
             </div>
             
             <!-- 发现渠道 -->
             <div class="form-group">
-                <label class="required">你当初是怎么知道这家店的？</label>
+                <label class="required">你是怎么知道 J.VOGUE 的？</label>
                 <div class="options" id="channels">
-                    <button type="button" class="option-btn" data-value="小红书">小红书</button>
-                    <button type="button" class="option-btn" data-value="朋友推荐">朋友推荐</button>
-                    <button type="button" class="option-btn" data-value="路过">路过</button>
-                    <button type="button" class="option-btn" data-value="Google">Google Review / Google</button>
-                    <button type="button" class="option-btn" data-value="IG/FB">IG/FB</button>
+                    <button type="button" class="option-btn" data-value="小红书">📕 小红书</button>
+                    <button type="button" class="option-btn" data-value="朋友推荐">👥 朋友推荐</button>
+                    <button type="button" class="option-btn" data-value="路过门店">🚶 路过门店</button>
+                    <button type="button" class="option-btn" data-value="Instagram">📷 Instagram</button>
+                    <button type="button" class="option-btn" data-value="Facebook">📘 Facebook</button>
                 </div>
                 <input type="hidden" id="selectedChannel" name="channel" required>
             </div>
             
-            <!-- 体验描述 -->
+            <!-- 穿搭感受 -->
             <div class="form-group">
-                <label class="required">如果让你跟朋友分享，你会怎么形容这次体验？</label>
-                <textarea id="experience" name="experience" placeholder="为什么来、过程如何、值不值得推荐..." required></textarea>
+                <label class="required">分享你的穿搭体验</label>
+                <textarea id="experience" name="experience" placeholder="穿起来感觉如何？搭配什么衣服？适合什么场合？" required></textarea>
             </div>
             
             <!-- 附加感受 -->
             <div class="form-group">
-                <label>想补充一点小心情吗？（可选）</label>
-                <textarea id="mood" name="mood" placeholder="不一定是好评，也可以是惊喜、想法、吐槽或小愿望..."></textarea>
+                <label>还有什么想补充的吗？（可选）</label>
+                <textarea id="mood" name="mood" placeholder="购物体验、售后服务、回购意愿..."></textarea>
             </div>
             
             <!-- 图片上传 -->
             <div class="form-group">
-                <label class="required">上传图片（最多1张）</label>
+                <label class="required">上传你的穿搭照片</label>
                 <div class="upload-area" id="uploadArea">
-                    <div>📷</div>
-                    <p>点击上传图片</p>
+                    <div class="icon">📸</div>
+                    <p>点击上传照片</p>
+                    <p style="font-size: 12px; color: #999; margin-top: 8px;">支持 JPG、PNG 格式</p>
                     <input type="file" id="imageInput" accept="image/*" class="hidden" required>
                 </div>
                 <img id="previewImage" class="preview-image hidden">
             </div>
             
             <button type="submit" class="generate-btn">
-                ✨ 生成小红书文案
+                ✨ 生成分享文案
             </button>
         </form>
     </div>
@@ -253,21 +383,30 @@
         // 选项按钮选择逻辑
         document.querySelectorAll('.options').forEach(group => {
             const buttons = group.querySelectorAll('.option-btn');
-            const isSingleSelect = group.id !== 'services'; // 服务项目可多选，其他单选
+            const isMultiSelect = group.id === 'productTypes'; // 产品类型可多选
             const hiddenInput = group.parentElement.querySelector('input[type="hidden"]');
             
             buttons.forEach(btn => {
                 btn.addEventListener('click', () => {
-                    if (isSingleSelect) {
-                        buttons.forEach(b => b.classList.remove('selected'));
-                        btn.classList.add('selected');
-                        hiddenInput.value = btn.dataset.value;
-                    } else {
+                    if (isMultiSelect) {
                         btn.classList.toggle('selected');
                         const selected = group.querySelectorAll('.option-btn.selected');
                         hiddenInput.value = Array.from(selected).map(b => b.dataset.value).join(',');
+                    } else {
+                        buttons.forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
+                        hiddenInput.value = btn.dataset.value;
                     }
                 });
+            });
+        });
+        
+        // 模板选择
+        document.querySelectorAll('.template-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.template-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                document.getElementById('selectedTemplate').value = btn.dataset.template;
             });
         });
         
@@ -291,18 +430,115 @@
             }
         });
         
+        // 一键生成文案
+        document.getElementById('quickGenerateBtn').addEventListener('click', () => {
+            const template = document.getElementById('selectedTemplate').value;
+            
+            if (!template) {
+                alert('请先选择一个分享风格模板！');
+                return;
+            }
+            
+            // 自动选择默认选项
+            autoSelectDefaults();
+            
+            // 根据模板生成文案
+            const generatedText = generateByTemplate(template);
+            document.getElementById('experience').value = generatedText;
+            
+            // 提示用户
+            alert('✨ 文案已自动生成！\n\n你可以：\n1. 直接点击"生成分享文案"\n2. 或修改一下再生成');
+            
+            // 滚动到表单底部
+            document.querySelector('.generate-btn').scrollIntoView({ behavior: 'smooth' });
+        });
+        
+        // 自动选择默认选项
+        function autoSelectDefaults() {
+            // 选择产品类型（上衣）
+            const productBtn = document.querySelector('#productTypes .option-btn[data-value="上衣"]');
+            if (productBtn) productBtn.click();
+            
+            // 选择最满意的地方（版型合身）
+            const highlightBtn = document.querySelector('#highlights .option-btn[data-value="版型合身"]');
+            if (highlightBtn) highlightBtn.click();
+            
+            // 选择发现渠道（小红书）
+            const channelBtn = document.querySelector('#channels .option-btn[data-value="小红书"]');
+            if (channelBtn) channelBtn.click();
+        }
+        
+        // 根据模板生成文案
+        function generateByTemplate(template) {
+            const templates = {
+                casual: `在 J.VOGUE 买到一件超满意的上衣！
+
+版型真的很合身，穿起来特别舒服～随便搭个牛仔裤就很好看，日常出门完全没问题。
+
+价格也很实惠，性价比超高！已经推荐给朋友了 👍`,
+                
+                fashion: `✨ J.VOGUE 新品必入！
+
+这件上衣的设计真的太戳我了！剪裁利落又不失温柔，穿上瞬间提升气质。
+
+面料质感很好，细节处理也很到位。无论是通勤还是约会都能轻松驾驭，真的是衣橱必备单品！
+
+#JVogue #时尚穿搭 #OOTD`,
+                
+                detailed: `【J.VOGUE 购物分享】
+
+🛍️ 购买单品：简约款上衣
+👍 满意点：版型合身、面料舒适
+💰 价格区间：中等价位，性价比高
+
+【穿着体验】
+上身效果比想象中好很多！版型修身但不紧绷，活动起来很自在。面料亲肤透气，夏天穿也不会闷热。
+
+【搭配建议】
+可以搭配高腰裤显腿长，或者配半身裙走温柔路线。一件单品多种风格，真的很实穿！
+
+【总结】
+会继续回购，期待更多新品～`,
+                
+                lifestyle: `今日份小确幸 💫
+
+逛街偶然走进 J.VOGUE，结果被这件上衣圈粉了！
+
+简约的设计刚好是我喜欢的风格，穿上身的那一刻就知道：就是它了。
+
+有时候幸福很简单，一件合身的衣服，一个好心情，就能让一整天都闪闪发光 ✨
+
+#JVogue #生活美学 #简单的美好`
+            };
+            
+            return templates[template] || templates.casual;
+        }
+        
         // 表单提交
         document.getElementById('reviewForm').addEventListener('submit', (e) => {
             e.preventDefault();
             
+            // 检查必填项
+            const products = document.getElementById('selectedProducts').value;
+            const highlight = document.getElementById('selectedHighlight').value;
+            const channel = document.getElementById('selectedChannel').value;
+            const experience = document.getElementById('experience').value;
+            const image = previewImage.src;
+            
+            if (!products || !highlight || !channel || !experience || !image || image === '') {
+                alert('请填写所有必填项！');
+                return;
+            }
+            
             // 收集表单数据
             const formData = {
-                services: document.getElementById('selectedServices').value,
-                feeling: document.getElementById('selectedFeeling').value,
-                channel: document.getElementById('selectedChannel').value,
-                experience: document.getElementById('experience').value,
+                products,
+                highlight,
+                channel,
+                experience,
                 mood: document.getElementById('mood').value,
-                image: previewImage.src
+                image,
+                template: document.getElementById('selectedTemplate').value
             };
             
             // 保存到 localStorage
