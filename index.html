@@ -266,6 +266,106 @@
             color: white;
             border-color: #333;
         }
+        
+        /* AI 生成按钮样式 */
+        .textarea-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .ai-generate-btn {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .ai-generate-btn:hover {
+            background: #555;
+            transform: translateY(-1px);
+        }
+        
+        .ai-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .ai-popup.show {
+            display: flex;
+        }
+        
+        .ai-popup-content {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+        }
+        
+        .ai-popup-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .ai-popup-desc {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .ai-template-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .ai-template-btn {
+            padding: 10px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .ai-template-btn:hover,
+        .ai-template-btn.selected {
+            background: #333;
+            color: white;
+            border-color: #333;
+        }
+        
+        .ai-popup-close {
+            background: #f0f0f0;
+            color: #333;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -283,31 +383,6 @@
         </div>
         
         <form id="reviewForm">
-            <!-- 一键生成区域（给懒惰想的顾客） -->
-            <div class="quick-generate-section">
-                <div class="quick-generate-title">⚡ 懒得想文案？</div>
-                <p class="quick-generate-desc">选择模板，AI 一键生成完美分享文案</p>
-                
-                <div class="template-selector">
-                    <label>选择分享风格：</label>
-                    <div class="template-options" id="templateOptions">
-                        <button type="button" class="template-btn" data-template="casual">😊 轻松随意</button>
-                        <button type="button" class="template-btn" data-template="fashion">✨ 时尚种草</button>
-                        <button type="button" class="template-btn" data-template="detailed">📝 详细测评</button>
-                        <button type="button" class="template-btn" data-template="lifestyle">💫 生活方式</button>
-                    </div>
-                    <input type="hidden" id="selectedTemplate" name="template">
-                </div>
-                
-                <button type="button" class="quick-generate-btn" id="quickGenerateBtn">
-                    ✨ 一键生成文案
-                </button>
-            </div>
-            
-            <div class="divider">
-                <span>或 自己填写</span>
-            </div>
-            
             <!-- 购买产品类型 -->
             <div class="form-group">
                 <label class="required">你购买了什么类型的服饰？</label>
@@ -351,7 +426,12 @@
             
             <!-- 穿搭感受 -->
             <div class="form-group">
-                <label class="required">分享你的穿搭体验</label>
+                <div class="textarea-header">
+                    <label class="required">分享你的穿搭体验</label>
+                    <button type="button" class="ai-generate-btn" id="aiGenerateBtn">
+                        ✨ AI 生成
+                    </button>
+                </div>
                 <textarea id="experience" name="experience" placeholder="穿起来感觉如何？搭配什么衣服？适合什么场合？" required></textarea>
             </div>
             
@@ -377,6 +457,29 @@
                 ✨ 生成分享文案
             </button>
         </form>
+    </div>
+    
+    <!-- AI 生成弹窗 -->
+    <div class="ai-popup" id="aiPopup">
+        <div class="ai-popup-content">
+            <div class="ai-popup-title">✨ AI 帮你写文案</div>
+            <p class="ai-popup-desc">选择分享风格，AI 自动生成穿搭体验文案</p>
+            
+            <div class="ai-template-options" id="aiTemplateOptions">
+                <button type="button" class="ai-template-btn" data-template="casual">😊 轻松随意</button>
+                <button type="button" class="ai-template-btn" data-template="fashion">✨ 时尚种草</button>
+                <button type="button" class="ai-template-btn" data-template="detailed">📝 详细测评</button>
+                <button type="button" class="ai-template-btn" data-template="lifestyle">💫 生活方式</button>
+            </div>
+            
+            <input type="hidden" id="aiSelectedTemplate">
+            
+            <button type="button" class="ai-generate-btn" id="confirmAiGenerate" style="width: 100%; justify-content: center;">
+                生成文案
+            </button>
+            <br>
+            <button type="button" class="ai-popup-close" id="closeAiPopup">取消</button>
+        </div>
     </div>
     
     <script>
@@ -410,6 +513,63 @@
             });
         });
         
+        // AI 生成弹窗逻辑
+        const aiPopup = document.getElementById('aiPopup');
+        const aiGenerateBtn = document.getElementById('aiGenerateBtn');
+        const closeAiPopup = document.getElementById('closeAiPopup');
+        const confirmAiGenerate = document.getElementById('confirmAiGenerate');
+        let selectedAiTemplate = '';
+        
+        // 打开弹窗
+        aiGenerateBtn.addEventListener('click', () => {
+            aiPopup.classList.add('show');
+        });
+        
+        // 关闭弹窗
+        closeAiPopup.addEventListener('click', () => {
+            aiPopup.classList.remove('show');
+            selectedAiTemplate = '';
+            document.querySelectorAll('.ai-template-btn').forEach(b => b.classList.remove('selected'));
+        });
+        
+        // 点击遮罩关闭
+        aiPopup.addEventListener('click', (e) => {
+            if (e.target === aiPopup) {
+                aiPopup.classList.remove('show');
+            }
+        });
+        
+        // 选择模板
+        document.querySelectorAll('.ai-template-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.ai-template-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedAiTemplate = btn.dataset.template;
+            });
+        });
+        
+        // 确认生成
+        confirmAiGenerate.addEventListener('click', () => {
+            if (!selectedAiTemplate) {
+                alert('请先选择一个分享风格！');
+                return;
+            }
+            
+            // 自动选择默认选项
+            autoSelectDefaults();
+            
+            // 根据模板生成文案
+            const generatedText = generateByTemplate(selectedAiTemplate);
+            document.getElementById('experience').value = generatedText;
+            
+            // 关闭弹窗
+            aiPopup.classList.remove('show');
+            
+            // 清空选择
+            selectedAiTemplate = '';
+            document.querySelectorAll('.ai-template-btn').forEach(b => b.classList.remove('selected'));
+        });
+        
         // 图片上传预览
         const uploadArea = document.getElementById('uploadArea');
         const imageInput = document.getElementById('imageInput');
@@ -430,48 +590,35 @@
             }
         });
         
-        // 一键生成文案
-        document.getElementById('quickGenerateBtn').addEventListener('click', () => {
-            const template = document.getElementById('selectedTemplate').value;
-            
-            if (!template) {
-                alert('请先选择一个分享风格模板！');
-                return;
+        // 自动选择默认选项（如果用户还没选）
+        function autoSelectDefaults() {
+            // 选择产品类型（上衣）- 只在没有选择时
+            if (!document.getElementById('selectedProducts').value) {
+                const productBtn = document.querySelector('#productTypes .option-btn[data-value="上衣"]');
+                if (productBtn) productBtn.click();
             }
             
-            // 自动选择默认选项
-            autoSelectDefaults();
+            // 选择最满意的地方（版型合身）- 只在没有选择时
+            if (!document.getElementById('selectedHighlight').value) {
+                const highlightBtn = document.querySelector('#highlights .option-btn[data-value="版型合身"]');
+                if (highlightBtn) highlightBtn.click();
+            }
             
-            // 根据模板生成文案
-            const generatedText = generateByTemplate(template);
-            document.getElementById('experience').value = generatedText;
-            
-            // 提示用户
-            alert('✨ 文案已自动生成！\n\n你可以：\n1. 直接点击"生成分享文案"\n2. 或修改一下再生成');
-            
-            // 滚动到表单底部
-            document.querySelector('.generate-btn').scrollIntoView({ behavior: 'smooth' });
-        });
-        
-        // 自动选择默认选项
-        function autoSelectDefaults() {
-            // 选择产品类型（上衣）
-            const productBtn = document.querySelector('#productTypes .option-btn[data-value="上衣"]');
-            if (productBtn) productBtn.click();
-            
-            // 选择最满意的地方（版型合身）
-            const highlightBtn = document.querySelector('#highlights .option-btn[data-value="版型合身"]');
-            if (highlightBtn) highlightBtn.click();
-            
-            // 选择发现渠道（小红书）
-            const channelBtn = document.querySelector('#channels .option-btn[data-value="小红书"]');
-            if (channelBtn) channelBtn.click();
+            // 选择发现渠道（小红书）- 只在没有选择时
+            if (!document.getElementById('selectedChannel').value) {
+                const channelBtn = document.querySelector('#channels .option-btn[data-value="小红书"]');
+                if (channelBtn) channelBtn.click();
+            }
         }
         
         // 根据模板生成文案
         function generateByTemplate(template) {
+            // 获取用户选择的品类，默认"衣服"
+            const products = document.getElementById('selectedProducts').value;
+            const productType = products ? products.split(',')[0] : '衣服';
+            
             const templates = {
-                casual: `在 J.VOGUE 买到一件超满意的上衣！
+                casual: `在 J.VOGUE 买到一件超满意的${productType}！
 
 版型真的很合身，穿起来特别舒服～随便搭个牛仔裤就很好看，日常出门完全没问题。
 
@@ -479,7 +626,7 @@
                 
                 fashion: `✨ J.VOGUE 新品必入！
 
-这件上衣的设计真的太戳我了！剪裁利落又不失温柔，穿上瞬间提升气质。
+这件${productType}的设计真的太戳我了！剪裁利落又不失温柔，穿上瞬间提升气质。
 
 面料质感很好，细节处理也很到位。无论是通勤还是约会都能轻松驾驭，真的是衣橱必备单品！
 
@@ -487,12 +634,12 @@
                 
                 detailed: `【J.VOGUE 购物分享】
 
-🛍️ 购买单品：简约款上衣
+🛍️ 购买单品：J.VOGUE ${productType}
 👍 满意点：版型合身、面料舒适
 💰 价格区间：中等价位，性价比高
 
 【穿着体验】
-上身效果比想象中好很多！版型修身但不紧绷，活动起来很自在。面料亲肤透气，夏天穿也不会闷热。
+上身效果比想象中好很多！版型修身但不紧绷，活动起来很自在。面料亲肤透气，穿着非常舒适。
 
 【搭配建议】
 可以搭配高腰裤显腿长，或者配半身裙走温柔路线。一件单品多种风格，真的很实穿！
@@ -502,11 +649,11 @@
                 
                 lifestyle: `今日份小确幸 💫
 
-逛街偶然走进 J.VOGUE，结果被这件上衣圈粉了！
+逛街偶然走进 J.VOGUE，结果被这件${productType}圈粉了！
 
 简约的设计刚好是我喜欢的风格，穿上身的那一刻就知道：就是它了。
 
-有时候幸福很简单，一件合身的衣服，一个好心情，就能让一整天都闪闪发光 ✨
+有时候幸福很简单，一件合身的${productType}，一个好心情，就能让一整天都闪闪发光 ✨
 
 #JVogue #生活美学 #简单的美好`
             };
