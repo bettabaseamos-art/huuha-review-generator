@@ -675,7 +675,8 @@
             const mood = document.getElementById('mood').value;
             const image = previewImage.src;
             
-            console.log('Values:', { products, highlight, channel, experience: experience?.substring(0, 20), hasImage: image && image.startsWith('data:') });
+            console.log('Image src length:', image?.length);
+            console.log('Image starts with data:', image?.startsWith('data:'));
             
             // 验证
             let missing = [];
@@ -683,35 +684,60 @@
             if (!highlight) missing.push('最满意的地方');
             if (!channel) missing.push('发现渠道');
             if (!experience || !experience.trim()) missing.push('穿搭体验');
-            if (!image || !image.startsWith('data:image')) missing.push('照片（请点击上传）');
+            if (!image || image === window.location.href || image === '') {
+                missing.push('照片（请点击上传）');
+            }
             
             if (missing.length > 0) {
                 alert('请填写以下项目：\n• ' + missing.join('\n• '));
+                // 恢复按钮
+                const btn = document.getElementById('submitBtn');
+                btn.disabled = false;
+                btn.textContent = '✨ 生成分享文案';
                 return;
             }
             
             // 按钮状态
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.textContent = '生成中...';
+            btn.textContent = '保存中...';
             
-            // 保存数据
-            const formData = {
-                products,
-                highlight,
-                channel,
-                experience: experience.trim(),
-                mood: mood || '',
-                image: image,
-                template: ''
-            };
-            
-            console.log('Saving to localStorage...');
-            localStorage.setItem('reviewData', JSON.stringify(formData));
-            
-            // 跳转
-            console.log('Redirecting to result.html');
-            window.location.href = 'result.html';
+            try {
+                // 保存数据
+                const formData = {
+                    products,
+                    highlight,
+                    channel,
+                    experience: experience.trim(),
+                    mood: mood || '',
+                    image: image,
+                    template: ''
+                };
+                
+                // 压缩图片如果太大
+                const dataStr = JSON.stringify(formData);
+                console.log('Data size:', dataStr.length);
+                
+                if (dataStr.length > 5000000) { // 5MB limit
+                    alert('图片太大，请上传较小的图片（建议 < 2MB）');
+                    btn.disabled = false;
+                    btn.textContent = '✨ 生成分享文案';
+                    return;
+                }
+                
+                localStorage.setItem('reviewData', dataStr);
+                console.log('Saved successfully');
+                
+                // 跳转
+                btn.textContent = '跳转中...';
+                window.location.href = 'result.html';
+                
+            } catch (err) {
+                console.error('Error:', err);
+                alert('保存失败：' + err.message + '\n请尝试缩小图片尺寸');
+                btn.disabled = false;
+                btn.textContent = '✨ 生成分享文案';
+            }
         });
     </script>
 </body>
