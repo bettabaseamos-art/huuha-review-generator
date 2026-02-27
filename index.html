@@ -448,12 +448,12 @@
                     <div class="icon">📸</div>
                     <p>点击上传照片</p>
                     <p style="font-size: 12px; color: #999; margin-top: 8px;">支持 JPG、PNG 格式</p>
-                    <input type="file" id="imageInput" accept="image/*" class="hidden" required>
+                    <input type="file" id="imageInput" accept="image/*" class="hidden">
                 </div>
                 <img id="previewImage" class="preview-image hidden">
             </div>
             
-            <button type="submit" class="generate-btn">
+            <button type="submit" class="generate-btn" id="submitBtn">
                 ✨ 生成分享文案
             </button>
         </form>
@@ -665,48 +665,53 @@
         document.getElementById('reviewForm').addEventListener('submit', (e) => {
             e.preventDefault();
             
-            // 检查必填项
+            console.log('Form submit clicked');
+            
+            // 获取值
             const products = document.getElementById('selectedProducts').value;
             const highlight = document.getElementById('selectedHighlight').value;
             const channel = document.getElementById('selectedChannel').value;
             const experience = document.getElementById('experience').value;
-            const imageInput = document.getElementById('imageInput');
+            const mood = document.getElementById('mood').value;
+            const image = previewImage.src;
             
-            let missingFields = [];
-            if (!products) missingFields.push('购买类型');
-            if (!highlight) missingFields.push('最满意的地方');
-            if (!channel) missingFields.push('发现渠道');
-            if (!experience || experience.trim() === '') missingFields.push('穿搭体验');
-            if (!imageInput.files || !imageInput.files[0]) missingFields.push('穿搭照片');
+            console.log('Values:', { products, highlight, channel, experience: experience?.substring(0, 20), hasImage: image && image.startsWith('data:') });
             
-            if (missingFields.length > 0) {
-                alert('请填写以下必填项：\n' + missingFields.join('\n'));
+            // 验证
+            let missing = [];
+            if (!products) missing.push('服饰类型');
+            if (!highlight) missing.push('最满意的地方');
+            if (!channel) missing.push('发现渠道');
+            if (!experience || !experience.trim()) missing.push('穿搭体验');
+            if (!image || !image.startsWith('data:image')) missing.push('照片（请点击上传）');
+            
+            if (missing.length > 0) {
+                alert('请填写以下项目：\n• ' + missing.join('\n• '));
                 return;
             }
             
-            // 读取图片
-            const file = imageInput.files[0];
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const imageData = e.target.result;
-                
-                // 收集表单数据
-                const formData = {
-                    products,
-                    highlight,
-                    channel,
-                    experience: experience.trim(),
-                    mood: document.getElementById('mood').value,
-                    image: imageData
-                };
-                
-                // 保存到 localStorage
-                localStorage.setItem('reviewData', JSON.stringify(formData));
-                
-                // 跳转到生成页面
-                window.location.href = 'result.html';
+            // 按钮状态
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = '生成中...';
+            
+            // 保存数据
+            const formData = {
+                products,
+                highlight,
+                channel,
+                experience: experience.trim(),
+                mood: mood || '',
+                image: image,
+                template: ''
             };
-            reader.readAsDataURL(file);
+            
+            console.log('Saving to localStorage...');
+            localStorage.setItem('reviewData', JSON.stringify(formData));
+            
+            // 跳转
+            console.log('Redirecting to result.html');
+            window.location.href = 'result.html';
         });
     </script>
 </body>
