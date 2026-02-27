@@ -405,7 +405,7 @@
         
         // 合成图片
         async function generateImage(userImageSrc) {
-            return new Promise((resolve) => {
+            return new Promise((resolve, reject) => {
                 const canvas = document.getElementById('generatedCanvas');
                 const ctx = canvas.getContext('2d');
                 
@@ -413,8 +413,33 @@
                 canvas.width = 900;
                 canvas.height = 1200;
                 
+                // 如果没有图片，使用纯色背景
+                if (!userImageSrc || userImageSrc === '') {
+                    // 使用渐变色背景
+                    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                    gradient.addColorStop(0, '#667eea');
+                    gradient.addColorStop(1, '#764ba2');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // 添加品牌标识
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 50px -apple-system, BlinkMacSystemFont, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                    ctx.shadowBlur = 10;
+                    ctx.fillText('J.VOGUE', canvas.width/2, canvas.height/2 - 20);
+                    
+                    ctx.font = '30px -apple-system, BlinkMacSystemFont, sans-serif';
+                    ctx.fillText('穿搭分享', canvas.width/2, canvas.height/2 + 30);
+                    
+                    resolve(canvas.toDataURL('image/jpeg', 0.9));
+                    return;
+                }
+                
                 // 加载用户图片
                 const img = new Image();
+                
                 img.onload = () => {
                     // 绘制背景图片（填充整个画布）
                     const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
@@ -449,38 +474,61 @@
                     
                     resolve(canvas.toDataURL('image/jpeg', 0.9));
                 };
+                
+                img.onerror = () => {
+                    // 图片加载失败，使用默认背景
+                    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                    gradient.addColorStop(0, '#667eea');
+                    gradient.addColorStop(1, '#764ba2');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 50px -apple-system, BlinkMacSystemFont, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('J.VOGUE', canvas.width/2, canvas.height/2);
+                    
+                    resolve(canvas.toDataURL('image/jpeg', 0.9));
+                };
+                
                 img.src = userImageSrc;
             });
         }
         
         // 初始化
         async function init() {
-            showProductInfo();
-            
-            // 模拟 AI 生成延迟
-            await new Promise(r => setTimeout(r, 2000));
-            
-            // 生成文案
-            const result = generateXiaohongshuContent(reviewData);
-            
-            // 显示文案
-            document.getElementById('generatedContent').textContent = result.content;
-            
-            // 显示标签
-            const tagsContainer = document.getElementById('tagsContainer');
-            result.hashtags.forEach(tag => {
-                const span = document.createElement('span');
-                span.className = 'tag';
-                span.textContent = tag;
-                tagsContainer.appendChild(span);
-            });
-            
-            // 合成图片
-            await generateImage(reviewData.image);
-            
-            // 隐藏加载，显示结果
-            document.getElementById('loadingSection').classList.add('hidden');
-            document.getElementById('resultSection').classList.remove('hidden');
+            try {
+                showProductInfo();
+                
+                // 模拟 AI 生成延迟
+                await new Promise(r => setTimeout(r, 2000));
+                
+                // 生成文案
+                const result = generateXiaohongshuContent(reviewData);
+                
+                // 显示文案
+                document.getElementById('generatedContent').textContent = result.content;
+                
+                // 显示标签
+                const tagsContainer = document.getElementById('tagsContainer');
+                result.hashtags.forEach(tag => {
+                    const span = document.createElement('span');
+                    span.className = 'tag';
+                    span.textContent = tag;
+                    tagsContainer.appendChild(span);
+                });
+                
+                // 合成图片
+                await generateImage(reviewData.image);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('generatedContent').textContent = '生成过程中出现错误，请返回重试。';
+            } finally {
+                // 隐藏加载，显示结果
+                document.getElementById('loadingSection').classList.add('hidden');
+                document.getElementById('resultSection').classList.remove('hidden');
+            }
         }
         
         // 复制文案
