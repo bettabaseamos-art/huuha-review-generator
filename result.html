@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生成结果 - Huuha Land 评价生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f0ff 0%, #fff0f5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(147, 112, 219, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 22px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .generated-image {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .content-box {
+            background: #f8f7ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .content-title {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .content-text {
+            color: #333;
+            line-height: 1.8;
+            font-size: 15px;
+            white-space: pre-wrap;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: white;
+            border: 1px solid #667eea;
+            color: #667eea;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .copy-btn.copied {
+            background: #27ae60;
+            border-color: #27ae60;
+            color: white;
+        }
+        
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .tag {
+            background: #e8e4ff;
+            color: #667eea;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 13px;
+        }
+        
+        .share-section {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .share-title {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .share-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .share-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 15px 25px;
+            border: none;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        .share-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+        }
+        
+        .share-btn.primary {
+            background: linear-gradient(135deg, #ff2442 0%, #ff6b6b 100%);
+            color: white;
+        }
+        
+        .share-icon {
+            font-size: 32px;
+        }
+        
+        .share-label {
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .tips {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #856404;
+        }
+        
+        .back-btn {
+            display: block;
+            text-align: center;
+            color: #667eea;
+            text-decoration: none;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 加载中 -->
+        <div id="loadingSection" class="card">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>正在生成小红书文案...⏳</p>
+                <p style="color: #999; font-size: 13px; margin-top: 10px;">预计需要 5-10 秒</p>
+            </div>
+        </div>
+        
+        <!-- 生成结果 -->
+        <div id="resultSection" class="hidden">
+            <div class="card">
+                <div class="header">
+                    <h1>✨ 生成成功！</h1>
+                </div>
+                
+                <!-- 合成图片 -->
+                <canvas id="generatedCanvas" class="generated-image"></canvas>
+                
+                <button id="downloadBtn" class="copy-btn" style="position: static; margin-bottom: 20px;">
+                    💾 下载图片
+                </button>
+                
+                <!-- 文案内容 -->
+                <div class="content-box">
+                    <button class="copy-btn" id="copyContentBtn">复制</button>
+                    <div class="content-title">📋 文案内容</div>
+                    <div id="generatedContent" class="content-text"></div>
+                    
+                    <div id="tagsContainer" class="tags"></div>
+                </div>
+                
+                <!-- 分享按钮 -->
+                <div class="share-section">
+                    <div class="share-title">分享至</div>
+                    
+                    <div class="share-buttons">
+                        <button class="share-btn primary" id="shareXhsBtn">
+                            <span class="share-icon">📕</span>
+                            <span class="share-label">小红书</span>
+                        </button>
+                        
+                        <button class="share-btn" id="copyAllBtn">
+                            <span class="share-icon">📋</span>
+                            <span class="share-label">复制全部</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="tips">
+                    💡 提示：点击"小红书"按钮将跳转到小红书，你可以直接粘贴已复制的文案和图片
+                </div>
+            </div>
+            
+            <a href="index.html" class="back-btn">← 返回重新填写</a>
+        </div>
+    </div>
+    
+    <script>
+        // 获取表单数据
+        const reviewData = JSON.parse(localStorage.getItem('reviewData') || '{}');
+        
+        if (!reviewData.experience) {
+            window.location.href = 'index.html';
+        }
+        
+        // 生成小红书文案
+        function generateXiaohongshuContent(data) {
+            const services = data.services.split(',').filter(s => s);
+            const serviceText = services.slice(0, 2).join('、');
+            
+            const templates = [
+                `我发现${data.feeling}！在 Huuha Land 市集逛了一圈，${serviceText}都超棒的～`,
+                `Huuha Land 市集打卡✨ 这里${data.feeling}！${serviceText}都值得试试～`,
+                `${data.feeling}的 Huuha Land 市集！逛了${serviceText}，体验感满分💯`
+            ];
+            
+            const title = templates[Math.floor(Math.random() * templates.length)];
+            
+            let content = `${title}\n\n`;
+            content += `${data.experience}\n\n`;
+            
+            if (data.mood) {
+                content += `${data.mood}\n\n`;
+            }
+            
+            content += `📍 Huuha Land 市集\n`;
+            content += `🕐 周五至周日 17:00-00:00\n`;
+            content += `📍 36, Jalan Kamuning, PINGGIRAN TRX, 55100 KL\n\n`;
+            
+            const hashtags = [
+                '#huuhaland',
+                '#huuhaland市集',
+                '#吃喝玩乐市集',
+                '#宝藏小众好物',
+                '#平价美食',
+                '#新春市集',
+                '#平民市集',
+                '#大马国民市集',
+                '#吉隆坡攻略',
+                '#马来西亚市集'
+            ];
+            
+            return {
+                title,
+                content,
+                hashtags
+            };
+        }
+        
+        // 合成图片
+        async function generateImage(userImageSrc) {
+            return new Promise((resolve) => {
+                const canvas = document.getElementById('generatedCanvas');
+                const ctx = canvas.getContext('2d');
+                
+                // 设置画布尺寸（小红书比例 3:4）
+                canvas.width = 900;
+                canvas.height = 1200;
+                
+                // 加载用户图片
+                const img = new Image();
+                img.onload = () => {
+                    // 绘制背景图片
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    // 添加渐变遮罩
+                    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                    gradient.addColorStop(0, 'rgba(0,0,0,0.5)');
+                    gradient.addColorStop(1, 'rgba(0,0,0,0)');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, canvas.width, 300);
+                    
+                    // 添加标题文字
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 60px -apple-system, BlinkMacSystemFont, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                    ctx.shadowBlur = 10;
+                    ctx.fillText('大马宝藏市集', canvas.width/2, 120);
+                    
+                    ctx.font = '40px -apple-system, BlinkMacSystemFont, sans-serif';
+                    ctx.fillText('好温暖好有惊喜', canvas.width/2, 180);
+                    
+                    resolve(canvas.toDataURL('image/jpeg', 0.9));
+                };
+                img.src = userImageSrc;
+            });
+        }
+        
+        // 初始化
+        async function init() {
+            // 模拟 AI 生成延迟
+            await new Promise(r => setTimeout(r, 2000));
+            
+            // 生成文案
+            const result = generateXiaohongshuContent(reviewData);
+            
+            // 显示文案
+            document.getElementById('generatedContent').textContent = result.content;
+            
+            // 显示标签
+            const tagsContainer = document.getElementById('tagsContainer');
+            result.hashtags.forEach(tag => {
+                const span = document.createElement('span');
+                span.className = 'tag';
+                span.textContent = tag;
+                tagsContainer.appendChild(span);
+            });
+            
+            // 合成图片
+            await generateImage(reviewData.image);
+            
+            // 隐藏加载，显示结果
+            document.getElementById('loadingSection').classList.add('hidden');
+            document.getElementById('resultSection').classList.remove('hidden');
+        }
+        
+        // 复制文案
+        document.getElementById('copyContentBtn').addEventListener('click', async function() {
+            const content = document.getElementById('generatedContent').textContent;
+            const tags = Array.from(document.querySelectorAll('.tag')).map(t => t.textContent).join(' ');
+            const fullText = content + '\n\n' + tags;
+            
+            await navigator.clipboard.writeText(fullText);
+            
+            this.textContent = '已复制!';
+            this.classList.add('copied');
+            setTimeout(() => {
+                this.textContent = '复制';
+                this.classList.remove('copied');
+            }, 2000);
+        });
+        
+        // 下载图片
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            const canvas = document.getElementById('generatedCanvas');
+            const link = document.createElement('a');
+            link.download = 'huuhaland-review.jpg';
+            link.href = canvas.toDataURL('image/jpeg', 0.9);
+            link.click();
+        });
+        
+        // 复制全部
+        document.getElementById('copyAllBtn').addEventListener('click', async function() {
+            const content = document.getElementById('generatedContent').textContent;
+            const tags = Array.from(document.querySelectorAll('.tag')).map(t => t.textContent).join(' ');
+            const fullText = content + '\n\n' + tags;
+            
+            await navigator.clipboard.writeText(fullText);
+            
+            this.querySelector('.share-label').textContent = '已复制!';
+            setTimeout(() => {
+                this.querySelector('.share-label').textContent = '复制全部';
+            }, 2000);
+        });
+        
+        // 跳转到小红书
+        document.getElementById('shareXhsBtn').addEventListener('click', async function() {
+            // 先复制内容
+            const content = document.getElementById('generatedContent').textContent;
+            const tags = Array.from(document.querySelectorAll('.tag')).map(t => t.textContent).join(' ');
+            const fullText = content + '\n\n' + tags;
+            
+            await navigator.clipboard.writeText(fullText);
+            
+            // 显示提示
+            alert('文案已复制到剪贴板！即将跳转到小红书...');
+            
+            // 跳转到小红书
+            // 方式1: 尝试唤起 App
+            window.location.href = 'xhsdiscover://';
+            
+            // 方式2: 如果 App 没安装，3秒后跳转到网页版
+            setTimeout(() => {
+                window.open('https://www.xiaohongshu.com/', '_blank');
+            }, 3000);
+        });
+        
+        // 启动
+        init();
+    </script>
+</body>
+</html>

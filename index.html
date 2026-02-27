@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Huuha Land - 评价生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f0ff 0%, #fff0f5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(147, 112, 219, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 32px;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+        
+        .required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+        
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .option-btn {
+            padding: 10px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .option-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .option-btn.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 15px;
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f8f7ff;
+        }
+        
+        .upload-area i {
+            font-size: 48px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .generate-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🐱</div>
+            <h1>Huuha Land</h1>
+            <p class="subtitle">分享你的市集体验</p>
+        </div>
+        
+        <form id="reviewForm">
+            <!-- 服务项目 -->
+            <div class="form-group">
+                <label class="required">你这次体验了哪些项目？</label>
+                <div class="options" id="services">
+                    <button type="button" class="option-btn" data-value="宠物相关产品">宠物相关产品</button>
+                    <button type="button" class="option-btn" data-value="大马品牌手工艺品">大马品牌手工艺品</button>
+                    <button type="button" class="option-btn" data-value="驻唱歌手">驻唱歌手</button>
+                    <button type="button" class="option-btn" data-value="特色美食">特色美食</button>
+                    <button type="button" class="option-btn" data-value="创意摊位">创意摊位</button>
+                </div>
+                <input type="hidden" id="selectedServices" name="services" required>
+            </div>
+            
+            <!-- 共鸣点 -->
+            <div class="form-group">
+                <label class="required">哪一点最让你有感觉？</label>
+                <div class="options" id="feelings">
+                    <button type="button" class="option-btn" data-value="新年气氛">有新年气氛</button>
+                    <button type="button" class="option-btn" data-value="宝藏小众好物">宝藏小众好物</button>
+                    <button type="button" class="option-btn" data-value="食物很好吃">食物很好吃</button>
+                    <button type="button" class="option-btn" data-value="轻松惬意的氛围">轻松惬意的氛围</button>
+                    <button type="button" class="option-btn" data-value="平民市集">平民市集终于复活了改名为Huuha Land</button>
+                </div>
+                <input type="hidden" id="selectedFeeling" name="feeling" required>
+            </div>
+            
+            <!-- 发现渠道 -->
+            <div class="form-group">
+                <label class="required">你当初是怎么知道这家店的？</label>
+                <div class="options" id="channels">
+                    <button type="button" class="option-btn" data-value="小红书">小红书</button>
+                    <button type="button" class="option-btn" data-value="朋友推荐">朋友推荐</button>
+                    <button type="button" class="option-btn" data-value="路过">路过</button>
+                    <button type="button" class="option-btn" data-value="Google">Google Review / Google</button>
+                    <button type="button" class="option-btn" data-value="IG/FB">IG/FB</button>
+                </div>
+                <input type="hidden" id="selectedChannel" name="channel" required>
+            </div>
+            
+            <!-- 体验描述 -->
+            <div class="form-group">
+                <label class="required">如果让你跟朋友分享，你会怎么形容这次体验？</label>
+                <textarea id="experience" name="experience" placeholder="为什么来、过程如何、值不值得推荐..." required></textarea>
+            </div>
+            
+            <!-- 附加感受 -->
+            <div class="form-group">
+                <label>想补充一点小心情吗？（可选）</label>
+                <textarea id="mood" name="mood" placeholder="不一定是好评，也可以是惊喜、想法、吐槽或小愿望..."></textarea>
+            </div>
+            
+            <!-- 图片上传 -->
+            <div class="form-group">
+                <label class="required">上传图片（最多1张）</label>
+                <div class="upload-area" id="uploadArea">
+                    <div>📷</div>
+                    <p>点击上传图片</p>
+                    <input type="file" id="imageInput" accept="image/*" class="hidden" required>
+                </div>
+                <img id="previewImage" class="preview-image hidden">
+            </div>
+            
+            <button type="submit" class="generate-btn">
+                ✨ 生成小红书文案
+            </button>
+        </form>
+    </div>
+    
+    <script>
+        // 选项按钮选择逻辑
+        document.querySelectorAll('.options').forEach(group => {
+            const buttons = group.querySelectorAll('.option-btn');
+            const isSingleSelect = group.id !== 'services'; // 服务项目可多选，其他单选
+            const hiddenInput = group.parentElement.querySelector('input[type="hidden"]');
+            
+            buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (isSingleSelect) {
+                        buttons.forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
+                        hiddenInput.value = btn.dataset.value;
+                    } else {
+                        btn.classList.toggle('selected');
+                        const selected = group.querySelectorAll('.option-btn.selected');
+                        hiddenInput.value = Array.from(selected).map(b => b.dataset.value).join(',');
+                    }
+                });
+            });
+        });
+        
+        // 图片上传预览
+        const uploadArea = document.getElementById('uploadArea');
+        const imageInput = document.getElementById('imageInput');
+        const previewImage = document.getElementById('previewImage');
+        
+        uploadArea.addEventListener('click', () => imageInput.click());
+        
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewImage.src = e.target.result;
+                    previewImage.classList.remove('hidden');
+                    uploadArea.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // 表单提交
+        document.getElementById('reviewForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // 收集表单数据
+            const formData = {
+                services: document.getElementById('selectedServices').value,
+                feeling: document.getElementById('selectedFeeling').value,
+                channel: document.getElementById('selectedChannel').value,
+                experience: document.getElementById('experience').value,
+                mood: document.getElementById('mood').value,
+                image: previewImage.src
+            };
+            
+            // 保存到 localStorage
+            localStorage.setItem('reviewData', JSON.stringify(formData));
+            
+            // 跳转到生成页面
+            window.location.href = 'result.html';
+        });
+    </script>
+</body>
+</html>
