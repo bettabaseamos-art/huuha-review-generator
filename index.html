@@ -670,29 +670,43 @@
             const highlight = document.getElementById('selectedHighlight').value;
             const channel = document.getElementById('selectedChannel').value;
             const experience = document.getElementById('experience').value;
-            const image = previewImage.src;
+            const imageInput = document.getElementById('imageInput');
             
-            if (!products || !highlight || !channel || !experience || !image || image === '') {
-                alert('请填写所有必填项！');
+            let missingFields = [];
+            if (!products) missingFields.push('购买类型');
+            if (!highlight) missingFields.push('最满意的地方');
+            if (!channel) missingFields.push('发现渠道');
+            if (!experience || experience.trim() === '') missingFields.push('穿搭体验');
+            if (!imageInput.files || !imageInput.files[0]) missingFields.push('穿搭照片');
+            
+            if (missingFields.length > 0) {
+                alert('请填写以下必填项：\n' + missingFields.join('\n'));
                 return;
             }
             
-            // 收集表单数据
-            const formData = {
-                products,
-                highlight,
-                channel,
-                experience,
-                mood: document.getElementById('mood').value,
-                image,
-                template: document.getElementById('selectedTemplate').value
+            // 读取图片
+            const file = imageInput.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imageData = e.target.result;
+                
+                // 收集表单数据
+                const formData = {
+                    products,
+                    highlight,
+                    channel,
+                    experience: experience.trim(),
+                    mood: document.getElementById('mood').value,
+                    image: imageData
+                };
+                
+                // 保存到 localStorage
+                localStorage.setItem('reviewData', JSON.stringify(formData));
+                
+                // 跳转到生成页面
+                window.location.href = 'result.html';
             };
-            
-            // 保存到 localStorage
-            localStorage.setItem('reviewData', JSON.stringify(formData));
-            
-            // 跳转到生成页面
-            window.location.href = 'result.html';
+            reader.readAsDataURL(file);
         });
     </script>
 </body>
